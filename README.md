@@ -16,6 +16,8 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npx expo start
    ```
 3. Run App with Expo Go App
+
+   Scan qr code and install it 
    
 In the output, you'll find options to open the app in a
 
