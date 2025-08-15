@@ -69,7 +69,7 @@ const listSlice = createSlice({
   },
 });
 
-export const { addList, addItemToList, delList, delItemFromList } = listSlice.actions;
+export const { addList, addItemToList, delList, delItemFromList ,editItemList} = listSlice.actions;
 
 // --------- Root Reducer ---------
 const rootReducer = combineReducers({

@@ -1,15 +1,16 @@
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useLocalSearchParams } from "expo-router";
-import React, { useState } from 'react';
-import { FlatList, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { FlatList, Text, View } from 'react-native';
 import { GestureHandlerRootView, Swipeable } from "react-native-gesture-handler";
 import { useDispatch, useSelector } from 'react-redux';
 import { CommonStyles } from "../constants/CommonStyles";
-import { addItemToList, AppDispatch, delItemFromList, RootState } from '../store/store';
+import { addItemToList, AppDispatch, delItemFromList, editItemList, RootState } from '../store/store';
 import CommonButton from "./component/CommonButton";
 import CommonModal from "./component/CommonModal";
 import ItemCard from "./component/ItemCard";
+import ItemForm from "./component/ItemForm";
 import RightSwipe from "./component/RightSwipe";
+import { showToast } from "./component/toastMessage";
 
 // Define item and list types
 interface Item {
@@ -34,33 +35,47 @@ interface ItemManagerScreenProps {
 
 export default function ItemManager({ route }: ItemManagerScreenProps) {
     const { id } = useLocalSearchParams<{ id: string }>();
-    const [newListName, setNewListName] = useState<string>('');
+    const [isEdit, setIsEdit] = useState<boolean>(false);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+    const defVaule = {
+        id: 0, name: '', quantity: "", notes: ''
+    }
 
+    const [initialValue, setInitialValue] = useState(defVaule);
 
     // Get specific list from Redux store
     const list = useSelector((state: RootState) =>
         state.lists.find((l: List) => l.id === id)
     );
-
     const dispatch = useDispatch<AppDispatch>();
-    const [itemName, setItemName] = useState<string>('');
-    const [itemQty, setItemQty] = useState<string>('');
-    const [itemNotes, setItemNotes] = useState<string>('');
 
-    const handleAddItem = () => {
-        console.log(itemName, itemQty, '===dsafs')
-        if (itemName.trim() && itemQty.trim()) {
+    const handleAddItem = (data: any) => {
+        console.log('sdasdasd', data)
+
+        const { id: itemid, name, quantity, notes } = data
+        console.log('sdasdasd', data)
+
+        if (isEdit) {
+            dispatch(
+                editItemList({
+                    listId: id,
+                    item: { id: itemid, name, quantity, notes },
+                })
+            );
+            showToast("Success, Item updated",'')
+            setIsEdit(false)
+
+        } else {
             dispatch(
                 addItemToList({
                     listId: id,
-                    item: { id: Date.now().toString(), name: itemName, quantity: itemQty, notes: itemNotes },
+                    item: { id: Date.now().toString(), name, quantity, notes },
                 })
             );
-            setItemName('');
-            setIsModalVisible(false)
-
+            showToast("Success, New item is added", "")
         }
+        setIsModalVisible(false)
+        setInitialValue(defVaule)
     };
 
     const handleDelete = (item: any) => {
@@ -70,24 +85,30 @@ export default function ItemManager({ route }: ItemManagerScreenProps) {
                 item
             })
         );
+                    showToast("Success", "Item Deleted")
+        
+
     };
-    const renderItems = ({ item, index }: any) => (
+    const renderItems = useCallback(({ item, index }: any) => (
         <Swipeable
             renderRightActions={(progress, dragX) => RightSwipe(progress, dragX, () => {
                 handleDelete(item)
             })}
             overshootRight={false}
         >
-            <TouchableOpacity>
-                <ItemCard data={item} />
-                <MaterialIcons />
-            </TouchableOpacity>
+            <ItemCard data={item} onPress={() => {
+                setIsEdit(true)
+                setInitialValue(item)
+                setIsModalVisible(true)
+            }} />
         </Swipeable>
-    )
+    ), [handleDelete])
 
     const onModalClose = () => {
         setIsModalVisible(false);
     };
+
+
 
     if (!list?.items) {
         return (
@@ -100,7 +121,10 @@ export default function ItemManager({ route }: ItemManagerScreenProps) {
     return (
 
         <View style={CommonStyles.mainContainer}>
-            <Text style={CommonStyles.title}>My Shopping Lists</Text>
+            <Text style={CommonStyles.title}>List: {list.title}</Text>
+
+            <Text style={CommonStyles.itemstitle}>Items List</Text>
+
             <GestureHandlerRootView style={{ flex: 1 }}>
                 <FlatList
                     data={list.items}
@@ -114,13 +138,13 @@ export default function ItemManager({ route }: ItemManagerScreenProps) {
                 />
             </GestureHandlerRootView>
             <View style={CommonStyles.absButtonView}>
-                <CommonButton title="Add List" onPress={() => setIsModalVisible(true)} />
+                <CommonButton title="Add Items" onPress={() => setIsModalVisible(true)} />
             </View>
             <CommonModal isVisible={isModalVisible} onCloseModal={onModalClose}>
-                <Text style={CommonStyles.title}>Add New List</Text>
+                <Text style={CommonStyles.modalTitle}>Add New Items</Text>
 
-                
-                <TextInput
+                <ItemForm initialValues={initialValue} formSubmit={handleAddItem} />
+                {/* <TextInput
                     placeholder="New Item Name"
                     value={itemName}
                     onChangeText={setItemName}
@@ -139,7 +163,7 @@ export default function ItemManager({ route }: ItemManagerScreenProps) {
                     onChangeText={setItemNotes}
                     style={CommonStyles.inputText}
                 />
-                <CommonButton title="Add Item" onPress={handleAddItem} />
+                <CommonButton title="Add Item" onPress={handleAddItem} /> */}
             </CommonModal>
         </View>
 

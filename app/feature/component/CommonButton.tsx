@@ -7,7 +7,9 @@ export default function CommonButton({ title, onPress }: any) {
             <TouchableOpacity onPress={onPress} >
                 <LinearGradient
                     // Button Linear Gradient
-                    colors={['#4c669f', '#3b5998', '#192f6a']}
+                    colors={['#1FA2FF', '#12D8FA', '#1FA2FF']}
+                    start={{ x: 0, y: 0 }} // left
+                    end={{ x: 1, y: 0 }}   // right
                     style={styles.button}>
                     <Text style={styles.text}>{title}</Text>
                 </LinearGradient>
@@ -32,5 +34,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         fontSize: 15,
         color: '#fff',
+        fontWeight:'bold'
     },
 });
