@@ -6,6 +6,10 @@ export const CommonStyles = StyleSheet.create({
         justifyContent: 'flex-start',
         padding: 20,
     },
+
+    container:{
+        flex: 1,
+    },
     // inputText: { borderWidth: 1, padding: 8, margin: 8, borderRadius: 8 },
     input: {
         borderWidth: 1,

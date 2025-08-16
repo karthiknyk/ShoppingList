@@ -9,12 +9,14 @@ export interface ListItem {
   name: string;
   quantity: string;
   notes: string;
+  bgcolor:string
 }
 
 export interface List {
   id: string;
   title: string;
   priority: string;
+  cardBg:string;
   items: ListItem[];
 }
 

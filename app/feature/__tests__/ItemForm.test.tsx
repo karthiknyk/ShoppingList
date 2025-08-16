@@ -18,7 +18,7 @@ describe('ItemForm', () => {
 
     expect(getByPlaceholderText('Enter your name')).toBeTruthy();
     expect(getByPlaceholderText('Enter Quantity')).toBeTruthy();
-    expect(getByPlaceholderText('Enter notes(Optional)')).toBeTruthy();
+    expect(getByPlaceholderText('Enter notes (Optional)')).toBeTruthy();
     expect(getByText('Submit')).toBeTruthy();
   });
 
@@ -61,7 +61,7 @@ describe('ItemForm', () => {
 
     fireEvent.changeText(getByPlaceholderText('Enter your name'), 'Apple');
     fireEvent.changeText(getByPlaceholderText('Enter Quantity'), '5');
-    fireEvent.changeText(getByPlaceholderText('Enter notes(Optional)'), 'Some notes');
+    fireEvent.changeText(getByPlaceholderText('Enter notes (Optional)'), 'Some notes');
 
     fireEvent.press(getByText('Submit'));
 

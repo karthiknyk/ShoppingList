@@ -5,10 +5,10 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 const ListCard = ({ data }: any) => {
-    const { title, priority, id } = data
+    const { title, priority, id ,cardBg} = data
 
     return (
-        <View style={[styles.listView, { backgroundColor: getRandomColor() }]}>
+        <View style={[styles.listView, { backgroundColor: cardBg }]}>
             <View>
                 <Text style={styles.title}>{title}</Text>
                 <Text style={CommonStyles.dateTitle}>{moment(new Date(Number(id))).format("DD MMM hh:mm a")}</Text>

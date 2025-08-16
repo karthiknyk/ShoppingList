@@ -1,4 +1,3 @@
-
 import { useRouter } from 'expo-router';
 import moment from 'moment';
 import React, { useCallback, useState } from 'react';
@@ -13,109 +12,135 @@ import ListForm from './feature/component/ListForm';
 import RightSwipe from './feature/component/RightSwipe';
 import { showToast } from './feature/component/toastMessage';
 import { addList, AppDispatch, delList, RootState } from './store/store';
+import { getRandomColor } from './utils/helper';
+
+// ---- FlatList renderItem  ----
+const RenderListItem = React.memo(({ item, onDelete, onPress }: any) => (
+  <Swipeable
+    renderRightActions={(progress, dragX) =>
+      RightSwipe(progress, dragX, () => onDelete(item.id))
+    }
+    overshootRight={false}
+  >
+    <TouchableOpacity style={styles.listWrapper} onPress={() => onPress(item.id)}>
+      <ListCard data={item} />
+    </TouchableOpacity>
+  </Swipeable>
+));
 
 export default function Home() {
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const defValue = {
-        id: 0, title: '', priority: ""
-    }
-    const [initialValue, setInitialValue] = useState(defValue);
-    const lists = useSelector((state: RootState) => state.lists);
-    const dispatch = useDispatch<AppDispatch>();
-    const router = useRouter();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const defValue = { id: 0, title: '', priority: '' };
+  const [initialValue, setInitialValue] = useState(defValue);
 
-    const handleAddList = (data: any) => {
-        const { title, priority } = data
-        dispatch(
-            addList({
-                id: Date.now().toString(),
-                title: title,
-                priority: priority,
-                items: [],
-            })
-        );
-        showToast("Success, New List is created", "")
-        setIsModalVisible(false);
-    };
+  const lists = useSelector((state: RootState) => state.lists);
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
 
-    const handleDelete = useCallback(
-        (id: string) => {
-            dispatch(delList({ listId: id }));
-            showToast("Success, List Deleted", "")
-        },
-        [dispatch]
+  const handleAddList = useCallback((data: any) => {
+    const { title, priority } = data;
+    dispatch(
+      addList({
+        id: Date.now().toString(),
+        title,
+        priority,
+        cardBg: getRandomColor(),
+        items: [],
+      })
     );
+    showToast('Success, New List is created', '');
+    setIsModalVisible(false);
+  }, [dispatch]);
 
-    const onModalClose = () => {
-        setIsModalVisible(false);
-    };
+  const handleDelete = useCallback(
+    (id: string) => {
+      dispatch(delList({ listId: id }));
+      showToast('Success, List Deleted', '');
+    },
+    [dispatch]
+  );
 
-    // Memoized FlatList render function
-    const renderList = useCallback(
-        ({ item }: any) => (
-            <Swipeable
-                renderRightActions={(progress, dragX) =>
-                    RightSwipe(progress, dragX, () => handleDelete(item.id))
-                }
-                overshootRight={false}
-            >
-                <TouchableOpacity
-                    style={{ padding: 5 }}
-                    onPress={() => router.push(`/feature/${item.id}`)}
-                >
-                    <ListCard data={item} />
-                </TouchableOpacity>
-            </Swipeable>
-        ),
-        [router, handleDelete]
-    );
+  const handleNavigate = useCallback(
+    (id: string) => {
+      router.push(`/feature/${id}`);
+    },
+    [router]
+  );
 
-    return (
-        <View style={styles.mainContainer}>
+  const onModalClose = () => setIsModalVisible(false);
 
-            <Text style={styles.headerTitle}>Hi, Karthik </Text>
-            <Text style={styles.timeText}>{moment(new Date()).format("DD-MM-YYYY hh:mm a")}</Text>
+  return (
+    <View style={styles.mainContainer}>
+      <Text style={styles.headerTitle}>Hi, Karthik</Text>
+      <Text style={styles.timeText}>
+        {moment(new Date()).format('DD-MM-YYYY hh:mm a')}
+      </Text>
 
-            <Text style={styles.title}>My Shopping Lists</Text>
+      <Text style={styles.title}>My Shopping Lists</Text>
 
-            <GestureHandlerRootView style={{ flex: 1 }}>
-                <FlatList
-                    data={lists}
-                    keyExtractor={(item) => item.id}
-                    renderItem={renderList}
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ paddingBottom: 80 }}
-                    ListEmptyComponent={() => (
-                        <View>
-                            <Text>No Data</Text>
-                        </View>
-                    )}
-                />
-            </GestureHandlerRootView>
-
-            <View style={styles.absButtonView}>
-                <CommonButton title="Add List" onPress={() => setIsModalVisible(true)} />
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <FlatList
+          data={lists}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <RenderListItem item={item} onDelete={handleDelete} onPress={handleNavigate} />
+          )}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 80 }}
+          ListEmptyComponent={() => (
+            <View>
+              <Text>No Data</Text>
             </View>
+          )}
+        />
+      </GestureHandlerRootView>
 
-            <CommonModal isVisible={isModalVisible} onCloseModal={onModalClose}>
-                <Text style={CommonStyles.modalTitle}>Add New List</Text>
-                <ListForm initialValues={initialValue} formSubmit={handleAddList} />
-            </CommonModal>
+      <View style={styles.absButtonView}>
+        <CommonButton title="Add List" onPress={() => setIsModalVisible(true)} />
+      </View>
 
-        </View>
-    );
+      <CommonModal isVisible={isModalVisible} onCloseModal={onModalClose}>
+        <Text style={CommonStyles.modalTitle}>Add New List</Text>
+        <ListForm initialValues={initialValue} formSubmit={handleAddList} />
+      </CommonModal>
+    </View>
+  );
 }
 
-
 const styles = StyleSheet.create({
-    mainContainer: {
-        flex: 1,
-        justifyContent: 'flex-start',
-        padding: 20,
-    },
-    title: { fontSize: 16, fontWeight: '500', paddingVertical: 8, textAlign: 'center' },
-    headerTitle: { fontSize: 18, fontWeight: '500', paddingBottom: 4, textAlign: 'left', color: 'blue' },
-    timeText: { fontSize: 12, fontWeight: '300', paddingBottom: 4, textAlign: 'left', color: 'grey' },
-
-    absButtonView: { position: 'absolute', bottom: 20, left: 0, right: 0, margin: 20 },
+  mainContainer: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    padding: 20,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: '500',
+    paddingVertical: 8,
+    textAlign: 'center',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '500',
+    paddingBottom: 4,
+    textAlign: 'left',
+    color: 'blue',
+  },
+  timeText: {
+    fontSize: 12,
+    fontWeight: '300',
+    paddingBottom: 4,
+    textAlign: 'left',
+    color: 'grey',
+  },
+  absButtonView: {
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
+    margin: 20,
+  },
+  listWrapper: {
+    padding: 5,
+  },
 });

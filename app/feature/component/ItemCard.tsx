@@ -3,8 +3,9 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React, { memo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-const ItemCard = ({ data, onPress }: any) => {
-    const { name, quantity, notes, id } = data
+const ItemCard = memo(({ data, onPress }: any) => {
+    const { name, quantity, notes, id ,bgcolor} = data
+    console.log('dsaljldksf')
     return (
 
         <View style={[styles.card, { backgroundColor: getRandomColor() }]}>
@@ -19,7 +20,7 @@ const ItemCard = ({ data, onPress }: any) => {
         </View>
 
     )
-};
+});
 
 const styles = StyleSheet.create({
 
