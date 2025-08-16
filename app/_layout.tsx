@@ -1,16 +1,16 @@
 import { Stack } from 'expo-router';
 import { Image, Text, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { persistor, store } from './store/store';
-import Toast from 'react-native-toast-message';
 export default function RootLayout() {
 
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <Stack>
-          <Stack.Screen name="feature/home"
+          <Stack.Screen name="index"
             options={{
               headerTitle: () => (
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>

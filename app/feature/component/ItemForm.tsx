@@ -36,6 +36,7 @@ export default function ItemForm({ initialValues, formSubmit }: any) {
                                     <TextInput
                                         style={CommonStyles.input}
                                         placeholder="Enter your name"
+                                        maxLength={30}
                                         onChangeText={handleChange('name')}
                                         onBlur={handleBlur('name')}
                                         value={values.name}
@@ -46,17 +47,18 @@ export default function ItemForm({ initialValues, formSubmit }: any) {
                                         style={CommonStyles.input}
                                         placeholder="Enter Quantity"
                                         keyboardType="numeric"
+                                        maxLength={3}
                                         onChangeText={handleChange('quantity')}
                                         onBlur={handleBlur('quantity')}
                                         value={values.quantity}
                                     />
                                     {touched.quantity && errors.quantity && <Text style={styles.error}>{errors.quantity}</Text>}
                                     <TextInput
-                                        style={CommonStyles.input}
-                                        placeholder="Enter notes(Optional)"
+                                        style={[CommonStyles.input, { height: 100, textAlignVertical: 'top' }]}
+                                        placeholder="Enter notes (Optional)"
                                         onChangeText={handleChange('notes')}
                                         onBlur={handleBlur('notes')}
-                                        multiline={true}
+                                        multiline
                                         numberOfLines={3}
                                         value={values.notes}
                                     />
@@ -86,5 +88,5 @@ const styles = StyleSheet.create({
     scrollContainer: {
         flexGrow: 1,
         justifyContent: 'center',
-      },
+    },
 });
