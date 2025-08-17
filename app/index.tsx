@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import moment from 'moment';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,6 +13,7 @@ import RightSwipe from './feature/component/RightSwipe';
 import { showToast } from './feature/component/toastMessage';
 import { addList, AppDispatch, delList, RootState } from './store/store';
 import { getRandomColor } from './utils/helper';
+import { checkAndSync } from './firebase/checkAndSync';
 
 // ---- FlatList renderItem  ----
 const RenderListItem = React.memo(({ item, onDelete, onPress }: any) => (
@@ -33,6 +34,10 @@ export default function Home() {
   const defValue = { id: 0, title: '', priority: '' };
   const [initialValue, setInitialValue] = useState(defValue);
 
+
+  useEffect(() => {
+    checkAndSync();
+  }, []);
   const lists = useSelector((state: RootState) => state.lists);
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
